@@ -1,0 +1,5 @@
+F:/Unity/Projects/LivingBooksAR/LivingBooks/.utmp/RelWithDebInfo/6w4x26y6/arm64-v8a/CMakeFiles/edit_cache.dir
+F:/Unity/Projects/LivingBooksAR/LivingBooks/.utmp/RelWithDebInfo/6w4x26y6/arm64-v8a/CMakeFiles/rebuild_cache.dir
+F:/Unity/Projects/LivingBooksAR/LivingBooks/.utmp/RelWithDebInfo/6w4x26y6/arm64-v8a/GameActivity/CMakeFiles/game.dir
+F:/Unity/Projects/LivingBooksAR/LivingBooks/.utmp/RelWithDebInfo/6w4x26y6/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+F:/Unity/Projects/LivingBooksAR/LivingBooks/.utmp/RelWithDebInfo/6w4x26y6/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir
