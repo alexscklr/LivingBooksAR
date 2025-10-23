@@ -1,2 +1,20 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# --- Unity Large Files via Git LFS ---
+LivingBooks/**/*.png filter=lfs diff=lfs merge=lfs -text
+LivingBooks/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+LivingBooks/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
+LivingBooks/**/*.tga filter=lfs diff=lfs merge=lfs -text
+LivingBooks/**/*.psd filter=lfs diff=lfs merge=lfs -text
+LivingBooks/**/*.fbx filter=lfs diff=lfs merge=lfs -text
+LivingBooks/**/*.obj filter=lfs diff=lfs merge=lfs -text
+LivingBooks/**/*.mp4 filter=lfs diff=lfs merge=lfs -text
+LivingBooks/**/*.wav filter=lfs diff=lfs merge=lfs -text
+LivingBooks/**/*.ogg filter=lfs diff=lfs merge=lfs -text
+LivingBooks/**/*.prefab filter=lfs diff=lfs merge=lfs -text
+LivingBooks/**/*.unity filter=lfs diff=lfs merge=lfs -text
+LivingBooks/**/*.anim filter=lfs diff=lfs merge=lfs -text
+LivingBooks/**/*.asset filter=lfs diff=lfs merge=lfs -text
+LivingBooks/**/*.mat filter=lfs diff=lfs merge=lfs -text
+LivingBooks/**/*.exr filter=lfs diff=lfs merge=lfs -text
