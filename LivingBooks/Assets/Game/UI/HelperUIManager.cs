@@ -17,6 +17,19 @@ public class HelperUIManager : MonoBehaviour
             helperPanel.SetActive(false);
     }
 
+    public void ShowHint(bool show)
+    {
+        if (show)
+        {
+            if (helperPanel)
+                helperPanel.SetActive(true);
+        }
+        else
+        {
+            HideHint();
+        }
+    }
+
     public void ShowHint(string message)
     {
         ShowHint(message, 0f); // 0 = Standardverhalten: bleibt sichtbar

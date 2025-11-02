@@ -4,7 +4,7 @@ public class TestSceneManager : MonoBehaviour
 {
     public GameObject bridge;
     public GameObject capsule;
-    public HelperUIManager helperUI;
+    private HelperUIManager helperUI;
 
     void Start()
     {

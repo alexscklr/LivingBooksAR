@@ -107,7 +107,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("GameManager: Story abgeschlossen – zurück zum Scanning.");
 
-        helperUI.ShowHint("Scanne das nächste Bild!");
+        helperUI.ShowHint("Sehr gut! Scanne das nächste Bild!");
         StartScanning();
     }
 
