@@ -88,7 +88,9 @@ public class GameManager : MonoBehaviour
         arScanner.OnMarkerDetected -= HandleMarkerDetected;
         arScanner.EnableScanning(false);
 
-        StartStory(markerID, position, rotation);
+        // Robust gegen null/leer – optionaler Fallback nur wenn wirklich nötig
+        var id = string.IsNullOrEmpty(markerID) ? "1" : markerID;
+        StartStory(id, position, rotation);
     }
 
     public void StartStory(string markerID, Vector3 position, Quaternion rotation)
@@ -98,7 +100,7 @@ public class GameManager : MonoBehaviour
 
         helperUI.ShowHint("Hilf Finn, die Aufgabe zu lösen!");
 
-        storyManager.LoadStoryScene(markerID);
+    storyManager.LoadStoryScene(markerID, position, rotation);
 
         Debug.Log($"GameManager: Story für Marker {markerID} gestartet.");
     }
