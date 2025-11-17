@@ -17,6 +17,7 @@ public class Scene1Manager : MonoBehaviour
         {
             foxAnimator = fox.GetComponent<Animator>();
         }
+        FindAnyObjectByType<HelperUIManager>().ShowHint("Szene 1: Hilf dem Fuchs, das Abenteuer zu bestehen!");
     }
 
     private void Start()
@@ -44,7 +45,7 @@ public class Scene1Manager : MonoBehaviour
         // Optional: weitere Aufräum-/Abschlusslogik für Szene 1
         if (GameManager.Instance != null && GameManager.Instance.storyManager != null)
         {
-            GameManager.Instance.storyManager.CompleteStory();
+            GameManager.Instance.OnStoryCompleted();
         }
     }
 }

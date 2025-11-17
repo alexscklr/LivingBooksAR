@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 /// <summary>
 /// Zentraler Ablaufcontroller des Spiels.
@@ -16,6 +17,7 @@ public class GameManager : MonoBehaviour
     public HelperUIManager helperUI;
     public ARScannerManager arScanner;
     public StoryManager storyManager;
+    [Tooltip("Router, der Prefabs pro Marker instanziiert")] public TrackedImagePrefabRouter prefabRouter;
 
     // === Game State ===
     public enum GameState
@@ -29,6 +31,13 @@ public class GameManager : MonoBehaviour
     }
 
     public GameState currentState { get; private set; } = GameState.None;
+
+    [Header("Scanning Optionen")]
+    [Tooltip("Verzögerung (Sekunden), bevor nach Story-Ende das Scannen erneut aktiviert wird")]
+    [SerializeField] private float restartScanDelay = 1.5f;
+
+    // Merkt sich den zuletzt erkannten Marker für die Story
+    private string _currentMarkerId;
 
     private void Awake()
     {
@@ -90,6 +99,7 @@ public class GameManager : MonoBehaviour
 
         // Robust gegen null/leer – optionaler Fallback nur wenn wirklich nötig
         var id = string.IsNullOrEmpty(markerID) ? "1" : markerID;
+        _currentMarkerId = id;
         StartStory(id, position, rotation);
     }
 
@@ -98,18 +108,44 @@ public class GameManager : MonoBehaviour
         currentState = GameState.InStory;
         uiManager.ShowScanningUI(false);
 
-        helperUI.ShowHint("Hilf Finn, die Aufgabe zu lösen!");
-
-    storyManager.LoadStoryScene(markerID, position, rotation);
-
-        Debug.Log($"GameManager: Story für Marker {markerID} gestartet.");
+        helperUI.ShowHint($"GameManager: Story für Marker {markerID} gestartet.");
     }
 
     public void OnStoryCompleted()
     {
         Debug.Log("GameManager: Story abgeschlossen – zurück zum Scanning.");
 
+        // Szene ausblenden (Router-Content verstecken) und Router pausieren
+        if (prefabRouter == null)
+        {
+            prefabRouter = FindFirstObjectByType<TrackedImagePrefabRouter>();
+        }
+        if (prefabRouter != null)
+        {
+            // Zuerst Instanz für aktuellen Marker zerstören, damit sie beim nächsten Erkennen frisch ist
+            if (!string.IsNullOrEmpty(_currentMarkerId))
+            {
+                prefabRouter.DestroyContentForMarker(_currentMarkerId);
+            }
+            // Sicherheitshalber alles verstecken (falls weitere Marker offen sind)
+            prefabRouter.HideAllContent();
+            prefabRouter.enabled = false; // verhindert sofortiges Wieder-Einblenden
+        }
+
         helperUI.ShowHint("Sehr gut! Scanne das nächste Bild!");
+        StartCoroutine(RestartScanningAfterDelay());
+    }
+
+    private IEnumerator RestartScanningAfterDelay()
+    {
+        yield return new WaitForSeconds(restartScanDelay);
+
+        // Router wieder aktivieren
+        if (prefabRouter != null)
+        {
+            prefabRouter.enabled = true;
+        }
+        _currentMarkerId = null;
         StartScanning();
     }
 
