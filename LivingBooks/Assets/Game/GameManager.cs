@@ -1,10 +1,12 @@
-using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems;
 
 /// <summary>
 /// Zentraler Ablaufcontroller des Spiels.
-/// Steuert Zustände, ruft die passenden Manager auf
-/// (UI, ARScanner, Story, HelperUI) und verwaltet den Spielfluss.
+/// Steuert Zustände, delegiert das Scannen und verwaltet die Story-Logik.
 /// </summary>
 public class GameManager : MonoBehaviour
 {
@@ -15,9 +17,14 @@ public class GameManager : MonoBehaviour
     [Header("Managers")]
     public UIManager uiManager;
     public HelperUIManager helperUI;
-    public ARScannerManager arScanner;
     public StoryManager storyManager;
-    [Tooltip("Router, der Prefabs pro Marker instanziiert")] public TrackedImagePrefabRouter prefabRouter;
+
+    [Tooltip("Router, der nur scannt und meldet")]
+    public TrackedImagePrefabRouter prefabRouter;
+
+    [Header("AR-Komponenten")]
+    [Tooltip("Der ARTrackedImageManager von AR Foundation. Muss im Inspector zugewiesen werden.")]
+    public ARTrackedImageManager trackedImageManager;
 
     // === Game State ===
     public enum GameState
@@ -34,15 +41,19 @@ public class GameManager : MonoBehaviour
 
     [Header("Scanning Optionen")]
     [Tooltip("Verzögerung (Sekunden), bevor nach Story-Ende das Scannen erneut aktiviert wird")]
-    [SerializeField] private float restartScanDelay = 1.5f;
+    [SerializeField]
+    private float restartScanDelay = 1.5f;
 
-    // Merkt sich den zuletzt erkannten Marker für die Story
-    private string _currentMarkerId;
+    // Merkt sich den Marker der aktuellen Story
+    private string _currentStoryMarkerName;
 
     private void Awake()
     {
         if (Instance != null && Instance != this)
         {
+            Debug.LogWarning(
+                "Mehrere GameManager-Instanzen gefunden. Zerstöre diese neue Instanz."
+            );
             Destroy(gameObject);
             return;
         }
@@ -53,8 +64,11 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        // Initialzustand
         GoToStartMenu();
+        if (prefabRouter != null)
+        {
+            prefabRouter.OnMarkerPrefabFound += HandleMarkerFound;
+        }
     }
 
     // --------------------------------------------------------------
@@ -64,88 +78,138 @@ public class GameManager : MonoBehaviour
     public void GoToStartMenu()
     {
         currentState = GameState.StartMenu;
-
         uiManager.ShowStartMenu(true);
         uiManager.ShowScanningUI(false);
         helperUI.ShowHint("Tippe auf „Start“, um das Abenteuer zu beginnen!");
+
+        // Deaktiviere den Router UND den übergeordneten AR-Manager,
+        // um jegliches Tracking im Hintergrund zu unterbinden.
+        if (prefabRouter != null)
+            prefabRouter.enabled = false;
+        if (trackedImageManager != null)
+            trackedImageManager.enabled = false;
+
+        // Beim Zurückkehren ins Menü eine laufende Story beenden
+        if (storyManager != null)
+            storyManager.DestroyCurrentStory();
+        _currentStoryMarkerName = null;
     }
 
     public void OnStartButtonPressed()
     {
-        StartScanning();
+        // Wir starten das Scannen über eine Coroutine, um eine saubere Trennung
+        // vom Startmenü zu gewährleisten und sofortige Scans zu vermeiden.
+        StartCoroutine(DelayedStartScanning());
     }
 
     public void StartScanning()
     {
+        // Setze den Zustand und aktualisiere die UI jedes Mal, wenn diese Methode aufgerufen wird.
+        // Das stellt sicher, dass die UI auch beim Neustart des Scannens nach einer Story korrekt ist.
         currentState = GameState.Scanning;
-
         uiManager.ShowStartMenu(false);
         uiManager.ShowPauseMenu(false);
         uiManager.ShowScanningUI(true);
-
         helperUI.ShowHint("Halte die Kamera auf ein Bild!");
 
-        arScanner.EnableScanning(true);
-        arScanner.OnMarkerDetected += HandleMarkerDetected;
+        // Aktiviere zuerst den AR-Manager und dann unseren Router.
+        if (trackedImageManager != null)
+            trackedImageManager.enabled = true;
+        if (prefabRouter != null)
+            prefabRouter.enabled = true;
 
         Debug.Log("GameManager: Scanning gestartet.");
     }
 
-    private void HandleMarkerDetected(string markerID, Vector3 position, Quaternion rotation)
+    private IEnumerator DelayedStartScanning()
     {
-        // Stoppe Scanning, starte Story
-        arScanner.OnMarkerDetected -= HandleMarkerDetected;
-        arScanner.EnableScanning(false);
+        // Wir warten einen kurzen Moment, bevor wir den Router aktivieren.
+        // Das verhindert, dass ein Marker, der zufällig schon im Bild ist,
+        // sofort die nächste Story startet.
+        yield return new WaitForSeconds(0.25f);
 
-        // Robust gegen null/leer – optionaler Fallback nur wenn wirklich nötig
-        var id = string.IsNullOrEmpty(markerID) ? "1" : markerID;
-        _currentMarkerId = id;
-        StartStory(id, position, rotation);
+        // Nach der Verzögerung rufen wir die zentrale StartScanning-Methode auf.
+        StartScanning();
+        Debug.Log("GameManager: Scanning nach Verzögerung aktiviert.");
     }
 
-    public void StartStory(string markerID, Vector3 position, Quaternion rotation)
+    private void HandleMarkerFound(ARTrackedImage trackedImage, GameObject prefab)
+    {
+        var markerName = trackedImage.referenceImage.name;
+
+        switch (currentState)
+        {
+            case GameState.Scanning:
+                // Neuer Marker im Scanning-Modus gefunden -> Story starten
+                Debug.Log(
+                    $"GameManager: Neuer Marker '{markerName}' im Scanning-Modus gefunden. Starte Story."
+                );
+                StartStory(markerName, trackedImage, prefab);
+                break;
+
+            case GameState.InStory:
+                // Ein Marker wurde gefunden, während bereits eine Story läuft
+                if (markerName == _currentStoryMarkerName)
+                {
+                    // Es ist der Marker der aktuellen Story -> Szene stabil halten
+                    storyManager.SpawnOrUpdateStoryPrefab(trackedImage, prefab);
+                }
+                else
+                {
+                    // Es ist ein anderer Marker -> ignorieren
+                    Debug.Log(
+                        $"GameManager: Anderer Marker '{markerName}' während Story '{_currentStoryMarkerName}' erkannt. Wird ignoriert."
+                    );
+                }
+                break;
+
+            // In allen anderen Zuständen (StartMenu, Paused, etc.) wird nichts getan.
+            default:
+                Debug.Log(
+                    $"GameManager: Marker '{markerName}' im Zustand '{currentState}' erkannt. Wird ignoriert."
+                );
+                break;
+        }
+    }
+
+    private void StartStory(string markerName, ARTrackedImage trackedImage, GameObject prefab)
     {
         currentState = GameState.InStory;
-        uiManager.ShowScanningUI(false);
+        _currentStoryMarkerName = markerName;
 
-        helperUI.ShowHint($"GameManager: Story für Marker {markerID} gestartet.");
+        uiManager.ShowScanningUI(false);
+        helperUI.ShowHint($"Story für Marker '{markerName}' gestartet.");
+
+        // Die Verantwortung zum Spawnen an den StoryManager übergeben
+        storyManager.SpawnOrUpdateStoryPrefab(trackedImage, prefab);
+
+        // Router kann weiterlaufen, um die Position der aktuellen Szene zu aktualisieren
+        if (prefabRouter != null)
+            prefabRouter.enabled = true;
     }
 
     public void OnStoryCompleted()
     {
         Debug.Log("GameManager: Story abgeschlossen – zurück zum Scanning.");
 
-        // Szene ausblenden (Router-Content verstecken) und Router pausieren
-        if (prefabRouter == null)
+        if (storyManager != null)
         {
-            prefabRouter = FindFirstObjectByType<TrackedImagePrefabRouter>();
+            storyManager.DestroyCurrentStory();
         }
-        if (prefabRouter != null)
-        {
-            // Zuerst Instanz für aktuellen Marker zerstören, damit sie beim nächsten Erkennen frisch ist
-            if (!string.IsNullOrEmpty(_currentMarkerId))
-            {
-                prefabRouter.DestroyContentForMarker(_currentMarkerId);
-            }
-            // Sicherheitshalber alles verstecken (falls weitere Marker offen sind)
-            prefabRouter.HideAllContent();
-            prefabRouter.enabled = false; // verhindert sofortiges Wieder-Einblenden
-        }
+        _currentStoryMarkerName = null;
 
-        helperUI.ShowHint("Sehr gut! Scanne das nächste Bild!");
+        // Anstatt direkt das Scannen neu zu starten, deaktivieren wir zuerst den AR-Manager,
+        // um seinen Zustand zurückzusetzen und "Geister-Marker" zu löschen.
+        if (trackedImageManager != null)
+            trackedImageManager.enabled = false;
+
+        // Dann starten wir den Scan-Vorgang nach einer Verzögerung neu.
         StartCoroutine(RestartScanningAfterDelay());
     }
 
     private IEnumerator RestartScanningAfterDelay()
     {
         yield return new WaitForSeconds(restartScanDelay);
-
-        // Router wieder aktivieren
-        if (prefabRouter != null)
-        {
-            prefabRouter.enabled = true;
-        }
-        _currentMarkerId = null;
         StartScanning();
     }
 
@@ -156,7 +220,6 @@ public class GameManager : MonoBehaviour
 
         currentState = GameState.Paused;
         Time.timeScale = 0f;
-
         uiManager.ShowPauseMenu(true);
         helperUI.ShowHint("Spiel pausiert.");
     }
@@ -167,19 +230,20 @@ public class GameManager : MonoBehaviour
             return;
 
         Time.timeScale = 1f;
+        currentState = GameState.InStory;
         uiManager.ShowPauseMenu(false);
         helperUI.HideHint();
-
-        currentState = GameState.InStory;
     }
 
     public void EndGame()
     {
         currentState = GameState.Ended;
-
         Time.timeScale = 1f;
         uiManager.ShowEndScreen();
-
         helperUI.ShowHint("Danke, dass du Finn geholfen hast!");
+
+        if (storyManager != null)
+            storyManager.DestroyCurrentStory();
+        _currentStoryMarkerName = null;
     }
 }
