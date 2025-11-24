@@ -18,6 +18,9 @@ public class Scene1Manager : SceneManagerBase
             foxAnimator = fox.GetComponent<Animator>();
         }
         ShowHint("Szene 1: Hilf dem Fuchs, das Abenteuer zu bestehen!");
+
+        GlobalAudioManager.Instance.PlayNarrator("speaker1");
+        GlobalAudioManager.Instance.PlayAmbient("forest", .5f);
     }
 
     private void Start()
@@ -35,6 +38,7 @@ public class Scene1Manager : SceneManagerBase
     {
         if (foxAnimator != null)
             foxAnimator.SetTrigger("FoxClicked");
+        GlobalAudioManager.Instance.PlaySmallSound("door", .5f);
     }
 
     // Wird vom AnimatorExitListener (UnityEvent) aufgerufen
@@ -43,5 +47,8 @@ public class Scene1Manager : SceneManagerBase
     public void OnAnimatorExitComplete()
     {
         FinishSceneNow();
+
+        GlobalAudioManager.Instance.StopAmbient();
+        GlobalAudioManager.Instance.StopNarrator();
     }
 }

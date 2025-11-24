@@ -18,6 +18,7 @@ public class Scene2Manager : SceneManagerBase
             foxAnimator = fox.GetComponent<Animator>();
         }
         ShowHint("Szene 2: Hilf dem Fuchs, den richtigen Weg zu finden!");
+        GlobalAudioManager.Instance.PlayAmbient("water", .5f);
     }
 
     // Update is called once per frame
@@ -37,5 +38,7 @@ public class Scene2Manager : SceneManagerBase
     public void OnAnimatorExitComplete()
     {
         FinishSceneNow();
+
+        GlobalAudioManager.Instance.StopAmbient();
     }
 }
