@@ -84,6 +84,12 @@ public class Scene4Manager : SceneManagerBase
 
     public void OnAllStonesActivated()
     {
+        foxAnimator.SetTrigger("start");
+    }
+
+
+    public void OnAnimatorExitComplete()
+    {
         FinishSceneAfter(2f, "Fantastisch! Finn hat den Fluss überquert.");
     }
 }

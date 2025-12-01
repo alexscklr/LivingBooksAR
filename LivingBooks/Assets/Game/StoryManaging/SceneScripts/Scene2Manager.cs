@@ -2,6 +2,15 @@ using UnityEngine;
 
 public class Scene2Manager : SceneManagerBase
 {
+    private enum SceneStates
+    {
+        Start,
+        StandingInMiddle,
+        End,
+    };
+
+    private SceneStates currentState = SceneStates.Start;
+
     [Header("Referenzen")]
     [Tooltip("Das Spielfigur-GameObject in der Szene")]
     public GameObject fox;
@@ -10,9 +19,11 @@ public class Scene2Manager : SceneManagerBase
     public RuntimeAnimatorController foxAnimatorController;
 
     private Animator foxAnimator;
+    private bool onePathClicked = false;
 
     void Start()
     {
+        currentState = SceneStates.Start;
         if (fox != null)
         {
             foxAnimator = fox.GetComponent<Animator>();
@@ -24,6 +35,26 @@ public class Scene2Manager : SceneManagerBase
     // Update is called once per frame
     void Update() { }
 
+    public void OnPathClicked(bool isCorrect)
+    {
+        if (!onePathClicked)
+        {
+            foxAnimator.SetTrigger("onePathClicked");
+            onePathClicked = true;
+        }
+
+        foxAnimator.SetBool("isCorrectPath", isCorrect);
+
+        if (isCorrect)
+        {
+            OnClickedOnCorrectPath();
+        }
+        else
+        {
+            OnClickedOnWrongPath();
+        }
+    }
+
     public void OnClickedOnWrongPath()
     {
         ShowHint("Das ist der falsche Weg! Versuch es nochmal.");
@@ -31,14 +62,18 @@ public class Scene2Manager : SceneManagerBase
 
     public void OnClickedOnCorrectPath()
     {
-        // ToDo: let fox move
-        FinishSceneAfter(2f, "Super! Du hast den richtigen Weg gefunden.");
+        ShowHint("Sehr gut! Das ist der richtige Weg.");
+        //FinishSceneAfter(2f, "Super! Du hast den richtigen Weg gefunden.");
     }
 
     public void OnAnimatorExitComplete()
     {
+<<<<<<< Updated upstream
         FinishSceneNow();
 
         GlobalAudioManager.Instance.StopAmbient();
+=======
+        FinishSceneAfter(2f, "Super! Du hast den richtigen Weg gefunden.");
+>>>>>>> Stashed changes
     }
 }

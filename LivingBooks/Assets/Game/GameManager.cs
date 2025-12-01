@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
     [Header("Scanning Optionen")]
     [Tooltip("Verzögerung (Sekunden), bevor nach Story-Ende das Scannen erneut aktiviert wird")]
     [SerializeField]
-    private float restartScanDelay = 1.5f;
+    private float restartScanDelay = 3f;
 
     // Merkt sich den Marker der aktuellen Story
     private string _currentStoryMarkerName;
