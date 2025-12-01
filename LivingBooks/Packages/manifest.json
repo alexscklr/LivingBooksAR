@@ -9,6 +9,7 @@
     "com.unity.render-pipelines.universal": "17.2.0",
     "com.unity.splines": "2.8.2",
     "com.unity.timeline": "1.8.9",
+    "com.unity.toonshader": "0.10.2-preview",
     "com.unity.xr.arcore": "6.2.0",
     "com.unity.xr.arfoundation": "6.2.0",
     "com.unity.xr.arkit": "6.2.0",
