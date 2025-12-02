@@ -68,12 +68,9 @@ public class Scene2Manager : SceneManagerBase
 
     public void OnAnimatorExitComplete()
     {
-<<<<<<< Updated upstream
         FinishSceneNow();
 
         GlobalAudioManager.Instance.StopAmbient();
-=======
         FinishSceneAfter(2f, "Super! Du hast den richtigen Weg gefunden.");
->>>>>>> Stashed changes
     }
 }

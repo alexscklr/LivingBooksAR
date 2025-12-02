@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(Collider))]
 public class ARObjectTapInteraction : MonoBehaviour
 {
     [Header("Tap Settings")]
@@ -17,25 +17,22 @@ public class ARObjectTapInteraction : MonoBehaviour
 
     void Update()
     {
-        // Touch input (mobile)
-        if (Touchscreen.current != null)
+        // Legacy Input (funktioniert ohne New Input System)
+        // Maus (Editor/Standalone)
+        if (Input.GetMouseButtonDown(0))
         {
-            var touch = Touchscreen.current.primaryTouch;
-            if (touch.press.wasPressedThisFrame)
-            {
-                Vector2 pos = touch.position.ReadValue();
-                TryRaycastTap(pos);
-            }
+            TryRaycastTap(Input.mousePosition);
         }
 
-        // Maus (Editor)
-#if UNITY_EDITOR
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        // Touch (Mobile)
+        if (Input.touchCount > 0)
         {
-            Vector2 pos = Mouse.current.position.ReadValue();
-            TryRaycastTap(pos);
+            var touch = Input.GetTouch(0);
+            if (touch.phase == TouchPhase.Began)
+            {
+                TryRaycastTap(touch.position);
+            }
         }
-#endif
     }
 
     void TryRaycastTap(Vector2 screenPos)
