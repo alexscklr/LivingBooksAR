@@ -18,16 +18,21 @@ public class Scene6Manager : SceneManagerBase
             foxAnimator = fox.GetComponent<Animator>();
         }
         ShowHint("Szene 6: Klopfe an Mia's Tür!");
-        GlobalAudioManager.Instance.PlayNarrator("speaker5");
-        GlobalAudioManager.Instance.PlayAmbient("forest", .5f);
+        GlobalAudioManager.Instance.PlayNarrator("speaker6");
+        GlobalAudioManager.Instance.PlayAmbient("forest", .05f);
     }
 
     public void OnKnocking(GameObject doorObject)
     {
+        if (GlobalAudioManager.Instance.IsNarratorPlaying)
+            return;
+
         GlobalAudioManager.Instance.PlaySmallSound("door");
         // Deaktiviere das angeklickte Türobjekt
         doorObject.SetActive(false);
         ShowHint("Tür angeklopft!");
-        FinishSceneAfter(2f, "Glückwunsch! Du hast den Schatz für den Fuchs gefunden.");
+
+        if (GlobalAudioManager.Instance.IsNarratorFinished)
+            FinishSceneAfter(2f, "Glückwunsch! Du hast den Schatz für den Fuchs gefunden.");
     }
 }

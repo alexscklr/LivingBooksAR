@@ -14,7 +14,7 @@ public class Scene3Manager : SceneManagerBase
     void Start()
     {
         GlobalAudioManager.Instance.PlayNarrator("speaker3");
-        GlobalAudioManager.Instance.PlayAmbient("forest", .5f);
+        GlobalAudioManager.Instance.PlayAmbient("forest", .05f);
     }
 
     // Update is called once per frame
@@ -22,6 +22,9 @@ public class Scene3Manager : SceneManagerBase
 
     public void OnClickedOnFood(GameObject foodObject)
     {
+        if (GlobalAudioManager.Instance.IsNarratorPlaying)
+            return;
+
         if (numberOfFoodToCollect > 0)
         {
             GlobalAudioManager.Instance.PlaySmallSound("food");
@@ -30,12 +33,13 @@ public class Scene3Manager : SceneManagerBase
             numberOfFoodToCollect--;
             ShowHint($"Essen gesammelt: {numberOfFoodToCollect}");
         }
-        else if (numberOfFoodToCollect == 0)
+        
+        if (numberOfFoodToCollect == 0)
         {
-            GlobalAudioManager.Instance.StopNarrator();
             GlobalAudioManager.Instance.PlayNarrator("speakerFood");
             ShowHint("Du hast schon genug Essen gesammelt!");
-            FinishSceneAfter(2f, "Fantastisch! Finn ist nun satt.");
+            if (GlobalAudioManager.Instance.IsNarratorFinished)
+                FinishSceneAfter(2f, "Fantastisch! Finn ist nun satt.");
         }
     }
 }

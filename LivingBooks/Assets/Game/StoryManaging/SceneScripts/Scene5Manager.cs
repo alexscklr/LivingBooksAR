@@ -22,11 +22,13 @@ public class Scene5Manager : SceneManagerBase
         }
         ShowHint("Szene 5: Sammle Blumen für Mia!");
         GlobalAudioManager.Instance.PlayNarrator("speaker5");
-        GlobalAudioManager.Instance.PlayAmbient("forest", .5f);
+        GlobalAudioManager.Instance.PlayAmbient("forest", .05f);
     }
 
     public void OnClickedOnFlower(GameObject flowerObject)
     {
+        if (GlobalAudioManager.Instance.IsNarratorPlaying)
+            return;
         // Deaktiviere das angeklickte Blumenobjekt
         flowerObject.SetActive(false);
         numberOfFlowersToCollect--;
@@ -34,7 +36,8 @@ public class Scene5Manager : SceneManagerBase
         GlobalAudioManager.Instance.PlaySmallSound("collect");
         if (numberOfFlowersToCollect <= 0)
         {
-            FinishSceneAfter(2f, "Toll! Du hast alle Blumen für Mia gesammelt.");
+            if (GlobalAudioManager.Instance.IsNarratorFinished)
+                FinishSceneAfter(2f, "Toll! Du hast alle Blumen für Mia gesammelt.");
         }
     }
 }

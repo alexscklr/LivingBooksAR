@@ -1,0 +1,1 @@
+C:\Users\Daniil\Documents\GitHub\LivingBooksAR\LivingBooks\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\build\intermediates\cxx\RelWithDebInfo\x4d2c415\obj\arm64-v8a

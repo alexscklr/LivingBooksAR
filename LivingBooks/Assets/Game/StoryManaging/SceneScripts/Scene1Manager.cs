@@ -31,11 +31,13 @@ public class Scene1Manager : SceneManagerBase
         }
 
         GlobalAudioManager.Instance.PlayNarrator("speaker1");
-        GlobalAudioManager.Instance.PlayAmbient("forest", .5f);
+        GlobalAudioManager.Instance.PlayAmbient("forest", .05f);
     }
 
     public void OnFoxClicked()
     {
+        if (GlobalAudioManager.Instance.IsNarratorPlaying)
+            return;
         if (foxAnimator != null)
             foxAnimator.SetTrigger("FoxClicked");
     }

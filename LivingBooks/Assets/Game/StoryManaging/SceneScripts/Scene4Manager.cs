@@ -42,7 +42,7 @@ public class Scene4Manager : SceneManagerBase
         }
 
         GlobalAudioManager.Instance.PlayNarrator("speaker4");
-        GlobalAudioManager.Instance.PlayAmbient("water", .5f);
+        GlobalAudioManager.Instance.PlayAmbient("water", .05f);
     }
 
     // Update is called once per frame
@@ -66,6 +66,8 @@ public class Scene4Manager : SceneManagerBase
 
     public void OnClickedOnStone(GameObject stoneObject)
     {
+        if (GlobalAudioManager.Instance.IsNarratorPlaying)
+            return;
         // Finde das passende Stein-Paar und aktiviere den zweiten Stein
         foreach (var stonePair in stonePairs)
         {
@@ -98,6 +100,7 @@ public class Scene4Manager : SceneManagerBase
 
     public void OnAnimatorExitComplete()
     {
-        FinishSceneAfter(2f, "Fantastisch! Finn hat den Fluss überquert.");
+        if (GlobalAudioManager.Instance.IsNarratorFinished)
+            FinishSceneAfter(2f, "Fantastisch! Finn hat den Fluss überquert.");
     }
 }

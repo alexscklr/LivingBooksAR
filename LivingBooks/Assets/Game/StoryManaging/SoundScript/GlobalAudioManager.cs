@@ -21,6 +21,9 @@ public class GlobalAudioManager : MonoBehaviour
 
     private Dictionary<string, AudioClip> sounds;
 
+    public bool IsNarratorPlaying => narratorSource.isPlaying;
+    public bool IsNarratorFinished => !narratorSource.isPlaying;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)

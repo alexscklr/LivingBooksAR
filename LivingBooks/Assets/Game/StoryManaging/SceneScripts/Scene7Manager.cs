@@ -31,6 +31,7 @@ public class Scene7Manager : SceneManagerBase
 
     public void OnAnimatorExitComplete()
     {
-        FinishSceneAfter(2f, "Happy End!");
+        if (GlobalAudioManager.Instance.IsNarratorFinished)
+            FinishSceneAfter(2f, "Happy End!");
     }
 }
