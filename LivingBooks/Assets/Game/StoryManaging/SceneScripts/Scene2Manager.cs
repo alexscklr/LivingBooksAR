@@ -29,7 +29,9 @@ public class Scene2Manager : SceneManagerBase
             foxAnimator = fox.GetComponent<Animator>();
         }
         ShowHint("Szene 2: Hilf dem Fuchs, den richtigen Weg zu finden!");
-        GlobalAudioManager.Instance.PlayAmbient("water", .5f);
+
+        GlobalAudioManager.Instance.PlayNarrator("speaker2");
+        GlobalAudioManager.Instance.PlayAmbient("forest", .5f);
     }
 
     // Update is called once per frame
@@ -44,7 +46,7 @@ public class Scene2Manager : SceneManagerBase
         }
 
         foxAnimator.SetBool("isCorrectPath", isCorrect);
-
+        GlobalAudioManager.Instance.StopNarrator();
         if (isCorrect)
         {
             OnClickedOnCorrectPath();
@@ -58,19 +60,20 @@ public class Scene2Manager : SceneManagerBase
     public void OnClickedOnWrongPath()
     {
         ShowHint("Das ist der falsche Weg! Versuch es nochmal.");
+        GlobalAudioManager.Instance.PlayNarrator("speakerWrongPath");
     }
 
     public void OnClickedOnCorrectPath()
     {
         ShowHint("Sehr gut! Das ist der richtige Weg.");
+        GlobalAudioManager.Instance.PlayNarrator("speakerCorrectPath");
         //FinishSceneAfter(2f, "Super! Du hast den richtigen Weg gefunden.");
     }
 
     public void OnAnimatorExitComplete()
     {
         FinishSceneNow();
-
-        GlobalAudioManager.Instance.StopAmbient();
+        
         FinishSceneAfter(2f, "Super! Du hast den richtigen Weg gefunden.");
     }
 }

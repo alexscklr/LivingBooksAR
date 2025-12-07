@@ -65,6 +65,8 @@ public class StoryManager : MonoBehaviour
             Debug.Log($"[StoryManager] Zerstöre Story-Prefab '{_activeStoryInstance.name}'.");
             Destroy(_activeStoryInstance);
             _activeStoryInstance = null;
+            GlobalAudioManager.Instance.StopNarrator();
+            GlobalAudioManager.Instance.StopAmbient();
         }
     }
 }

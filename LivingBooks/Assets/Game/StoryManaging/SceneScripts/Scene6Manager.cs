@@ -18,10 +18,13 @@ public class Scene6Manager : SceneManagerBase
             foxAnimator = fox.GetComponent<Animator>();
         }
         ShowHint("Szene 6: Klopfe an Mia's Tür!");
+        GlobalAudioManager.Instance.PlayNarrator("speaker5");
+        GlobalAudioManager.Instance.PlayAmbient("forest", .5f);
     }
 
     public void OnKnocking(GameObject doorObject)
     {
+        GlobalAudioManager.Instance.PlaySmallSound("door");
         // Deaktiviere das angeklickte Türobjekt
         doorObject.SetActive(false);
         ShowHint("Tür angeklopft!");

@@ -40,6 +40,9 @@ public class Scene4Manager : SceneManagerBase
             if (stonePair.activated != null)
                 stonePair.activated.SetActive(false);
         }
+
+        GlobalAudioManager.Instance.PlayNarrator("speaker4");
+        GlobalAudioManager.Instance.PlayAmbient("water", .5f);
     }
 
     // Update is called once per frame
@@ -74,7 +77,10 @@ public class Scene4Manager : SceneManagerBase
             {
                 stonePair.preset.SetActive(false);
                 if (stonePair.activated != null)
+                {
                     stonePair.activated.SetActive(true);
+                    GlobalAudioManager.Instance.PlaySmallSound("collect");
+                }
                 ShowHint("Gut gemacht! Weiter so.");
                 CheckIfAllStonesActivated();
                 return;
@@ -84,7 +90,9 @@ public class Scene4Manager : SceneManagerBase
 
     public void OnAllStonesActivated()
     {
+        GlobalAudioManager.Instance.StopNarrator();
         foxAnimator.SetTrigger("start");
+        GlobalAudioManager.Instance.PlayNarrator("speakerJump");
     }
 
 

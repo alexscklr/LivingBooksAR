@@ -11,27 +11,30 @@ public class Scene3Manager : SceneManagerBase
     private int numberOfFoodToCollect = 3;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start() { }
+    void Start()
+    {
+        GlobalAudioManager.Instance.PlayNarrator("speaker3");
+        GlobalAudioManager.Instance.PlayAmbient("forest", .5f);
+    }
 
     // Update is called once per frame
     void Update() { }
 
     public void OnClickedOnFood(GameObject foodObject)
     {
-        if (numberOfFoodToCollect <= 0)
+        if (numberOfFoodToCollect > 0)
         {
-            ShowHint("Du hast schon genug Essen gesammelt!");
-            return;
+            GlobalAudioManager.Instance.PlaySmallSound("food");
+            // Deaktiviere das angeklickte Essensobjekt
+            foodObject.SetActive(false);
+            numberOfFoodToCollect--;
+            ShowHint($"Essen gesammelt: {numberOfFoodToCollect}");
         }
-
-        // Deaktiviere das angeklickte Essensobjekt
-        foodObject.SetActive(false);
-        numberOfFoodToCollect--;
-
-        ShowHint($"Essen gesammelt: {numberOfFoodToCollect}");
-
-        if (numberOfFoodToCollect <= 0)
+        else if (numberOfFoodToCollect == 0)
         {
+            GlobalAudioManager.Instance.StopNarrator();
+            GlobalAudioManager.Instance.PlayNarrator("speakerFood");
+            ShowHint("Du hast schon genug Essen gesammelt!");
             FinishSceneAfter(2f, "Fantastisch! Finn ist nun satt.");
         }
     }
