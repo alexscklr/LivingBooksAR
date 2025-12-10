@@ -1,12 +1,12 @@
 using UnityEngine;
 
-public class Scene1Manager : MonoBehaviour
+public class Scene1Manager : SceneManagerBase
 {
     [Header("Referenzen")]
     [Tooltip("Das Spielfigur-GameObject in der Szene")]
     public GameObject fox;
 
-    [Tooltip("Runtime Animator Controller für den Fuchs (build-sicher)")]
+    [Tooltip("Runtime Animator Controller für den Fuchs")]
     public RuntimeAnimatorController foxAnimatorController;
 
     private Animator foxAnimator;
@@ -17,6 +17,7 @@ public class Scene1Manager : MonoBehaviour
         {
             foxAnimator = fox.GetComponent<Animator>();
         }
+        ShowHint("Szene 1: Hilf dem Fuchs, das Abenteuer zu bestehen!");
     }
 
     private void Start()
@@ -28,10 +29,15 @@ public class Scene1Manager : MonoBehaviour
         {
             foxAnimator.runtimeAnimatorController = foxAnimatorController;
         }
+
+        GlobalAudioManager.Instance.PlayNarrator("speaker1");
+        GlobalAudioManager.Instance.PlayAmbient("forest", .05f);
     }
 
     public void OnFoxClicked()
     {
+        if (GlobalAudioManager.Instance.IsNarratorPlaying)
+            return;
         if (foxAnimator != null)
             foxAnimator.SetTrigger("FoxClicked");
     }
@@ -41,10 +47,8 @@ public class Scene1Manager : MonoBehaviour
     // und NUR dieser spricht mit dem Story/Game-Management.
     public void OnAnimatorExitComplete()
     {
-        // Optional: weitere Aufräum-/Abschlusslogik für Szene 1
-        if (GameManager.Instance != null && GameManager.Instance.storyManager != null)
-        {
-            GameManager.Instance.storyManager.CompleteStory();
-        }
+        FinishSceneNow();
+        GlobalAudioManager.Instance.StopNarrator();
+        GlobalAudioManager.Instance.StopAmbient();
     }
 }

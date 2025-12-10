@@ -1,95 +1,72 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems;
 
+/// <summary>
+/// Verwaltet die Logik und die Prefabs für eine Story-Szene.
+/// Ist verantwortlich für das Instanziieren, Aktualisieren und Zerstören von Szenenobjekten.
+/// </summary>
 public class StoryManager : MonoBehaviour
 {
-    [System.Serializable]
-    public class StoryMapping
-    {
-        public string markerID; // z. B. "Marker1"
-        public GameObject storyPrefab; // z. B. StoryScene1 Prefab
-    }
-
-    [Header("Story Mapping")]
-    public List<StoryMapping> storyMappings = new List<StoryMapping>();
-
-    private GameObject currentStoryInstance;
-
-    [Header("AR Placement Optionen")]
-    public bool followMarkerRotation = false;
-    [Tooltip("Wie schnell die Story-Szene der Marker-Position folgt, wenn Rotation nicht übernommen wird. 0 = direkt, 1 = sehr stark")]
-    public float positionLerpPerFrame = 0.2f;
+    // Hält die Referenz auf das aktuell aktive Story-Prefab
+    private GameObject _activeStoryInstance;
 
     /// <summary>
-    /// Lädt die StoryScene zu einem Marker.
+    /// Spawnt oder aktualisiert das Story-Prefab an der Position des AR-Markers.
     /// </summary>
-    public void LoadStoryScene(string markerID, Vector3 position, Quaternion rotation)
+    /// <param name="trackedImage">Der AR-Marker, an den das Prefab gebunden wird.</param>
+    /// <param name="storyPrefab">Das zu instanziierende Prefab.</param>
+    public void SpawnOrUpdateStoryPrefab(ARTrackedImage trackedImage, GameObject storyPrefab)
     {
-        // Bestehende Story entfernen
-        if (currentStoryInstance != null)
-            Destroy(currentStoryInstance);
-
-        // Suche StoryPrefab für Marker
-        StoryMapping mapping = storyMappings.Find(m => m.markerID == markerID);
-        if (mapping == null)
+        if (trackedImage.trackingState == TrackingState.Tracking)
         {
-            Debug.LogWarning($"StoryManager: Kein Prefab für Marker {markerID} gefunden!");
-            return;
-        }
-
-        // Prefab instanziieren
-        currentStoryInstance = Instantiate(mapping.storyPrefab, Vector3.zero, Quaternion.identity);
-        currentStoryInstance.name = mapping.storyPrefab.name;
-
-        // AR-Following: Entweder direkt parenten (inkl. Rotation) oder nur Position folgen lassen
-        if (TrackedImageRegistry.TryGet(markerID, out var trackedImage) && trackedImage != null)
-        {
-            if (followMarkerRotation)
+            if (_activeStoryInstance == null)
             {
-                // Volle Pose vom Marker übernehmen
-                currentStoryInstance.transform.SetParent(trackedImage.transform, false);
-                currentStoryInstance.transform.localPosition = Vector3.zero;
-                currentStoryInstance.transform.localRotation = Quaternion.identity;
+                // Instanziiere das Prefab, wenn es noch nicht existiert
+                _activeStoryInstance = Instantiate(storyPrefab, trackedImage.transform);
+                Debug.Log(
+                    $"[StoryManager] Prefab '{storyPrefab.name}' für Marker '{trackedImage.referenceImage.name}' instanziiert."
+                );
             }
             else
             {
-                // Szene bleibt aufrecht: Nicht parenten, nur Position folgen (Rotation bleibt wie initial)
-                currentStoryInstance.transform.SetParent(this.transform, true);
-                currentStoryInstance.transform.SetPositionAndRotation(
+                // Stelle sicher, dass das Prefab aktiv und korrekt positioniert ist
+                if (!_activeStoryInstance.activeSelf)
+                {
+                    _activeStoryInstance.SetActive(true);
+                }
+                _activeStoryInstance.transform.SetPositionAndRotation(
                     trackedImage.transform.position,
-                    currentStoryInstance.transform.rotation
+                    trackedImage.transform.rotation
                 );
-
-                var follower = currentStoryInstance.GetComponent<ARTrackedPoseFollower>();
-                if (follower == null)
-                    follower = currentStoryInstance.AddComponent<ARTrackedPoseFollower>();
-                follower.markerID = markerID;
-                follower.followPosition = true;
-                follower.followRotation = false; // explizit NICHT rotieren
-                follower.positionLerpPerFrame = positionLerpPerFrame;
             }
         }
         else
         {
-            // Kein aktives Tracking: an übergebener Weltpose platzieren
-            currentStoryInstance.transform.SetParent(this.transform, true);
-            currentStoryInstance.transform.SetPositionAndRotation(position, rotation);
+            // Wenn das Tracking verloren geht, deaktiviere das Prefab
+            if (_activeStoryInstance != null && _activeStoryInstance.activeSelf)
+            {
+                _activeStoryInstance.SetActive(false);
+                Debug.Log(
+                    $"[StoryManager] Prefab für Marker '{trackedImage.referenceImage.name}' wegen Tracking-Verlust deaktiviert."
+                );
+            }
         }
-
-        // HelperUI Hinweis anzeigen
-        GameManager.Instance.helperUI.ShowHint($"Story {markerID} gestartet!", 1f);
-
-        Debug.Log($"StoryManager: {markerID} geladen.");
     }
 
     /// <summary>
-    /// Wird aufgerufen, wenn die Story abgeschlossen ist.
+    /// Zerstört das aktuell aktive Story-Prefab und räumt auf.
     /// </summary>
-    public void CompleteStory()
+    public void DestroyCurrentStory()
     {
-        if (currentStoryInstance != null)
-            Destroy(currentStoryInstance);
-
-        GameManager.Instance.OnStoryCompleted();
+        if (_activeStoryInstance != null)
+        {
+            Debug.Log($"[StoryManager] Zerstöre Story-Prefab '{_activeStoryInstance.name}'.");
+            Destroy(_activeStoryInstance);
+            _activeStoryInstance = null;
+            GlobalAudioManager.Instance.StopNarrator();
+            GlobalAudioManager.Instance.StopAmbient();
+        }
     }
 }
