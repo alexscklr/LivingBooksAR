@@ -1,13 +1,15 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HelperUIManager : MonoBehaviour
 {
     [Header("Helper UI Elements")]
     public GameObject helperPanel;
+    public Button showHintButton;
     public TMP_Text helperText;
-    public float autoHideDelay = 0f; // 0 = bleibt sichtbar
+    public float autoHideDelay = 3f; // 0 = bleibt sichtbar
 
     private Coroutine currentRoutine;
 
@@ -32,11 +34,13 @@ public class HelperUIManager : MonoBehaviour
 
     public void ShowHint(string message)
     {
-        ShowHint(message, 0f); // 0 = Standardverhalten: bleibt sichtbar
+        ShowHint(message, 3f); // 0 = Standardverhalten: bleibt sichtbar
     }
 
     public void ShowHint(string message, float duration)
     {
+        if (showHintButton)
+            showHintButton.gameObject.SetActive(false);
         if (helperText)
             helperText.text = message;
 
@@ -55,6 +59,8 @@ public class HelperUIManager : MonoBehaviour
 
     public void HideHint()
     {
+        if (showHintButton)
+            showHintButton.gameObject.SetActive(true);
         if (helperPanel)
             helperPanel.SetActive(false);
     }
