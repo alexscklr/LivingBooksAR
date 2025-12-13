@@ -135,7 +135,6 @@ public class GameManager : MonoBehaviour
     {
         currentState = GameState.InStory;
         uiManager.ShowScanningUI(false);
-        helperUI.ShowHint($"Story für Marker '{markerName}' gestartet.");
         storyManager.SpawnOrUpdateStoryPrefab(trackedImage, prefab);
     }
 
