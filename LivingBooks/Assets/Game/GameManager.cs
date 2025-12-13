@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour
         currentState = GameState.StartMenu;
         uiManager.ShowStartMenu(true);
         uiManager.ShowScanningUI(false);
-        helperUI.ShowHint("Tippe auf „Start“, um das Abenteuer zu beginnen!");
+        helperUI.ShowHint("Beginne das Abenteuer mit Finn!");
 
         if (prefabRouter != null)
             prefabRouter.enabled = false;
