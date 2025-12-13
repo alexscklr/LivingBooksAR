@@ -1,12 +1,12 @@
 # ninja log v5
-2	7630	7870716801093052	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	8d23a208052dac09
-780	7655	7870716813000551	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	31f7ff36920d26c0
-2161	7660	7870716816732628	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	e2a89dbd4b51eb27
-3258	7664	7870716824124085	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	cff3779ef11f0342
-4232	7735	7870716833730509	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	778492e1b75811f1
-7027	7940	7870716835981491	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	28a5f69ae5e56ac7
-5061	8248	7870716838927673	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	2fc0602c71fabbc
-5759	8533	7870716841832899	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	ef1fdcebf18ef919
-6422	9039	7870716846855201	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	2911ca566a0ee019
-7941	9073	7870716846972607	C:/xampp/htdocs/Uni/LivingBooksAR/LivingBooks/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/3r6j2z34/obj/arm64-v8a/libswappywrapper.so	d12c39f4010ea04f
-9039	10730	7870716863426062	C:/xampp/htdocs/Uni/LivingBooksAR/LivingBooks/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/3r6j2z34/obj/arm64-v8a/libgame.so	c8d79f20bdc626f8
+1	4644	7873661615861453	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	8d23a208052dac09
+356	4668	7873661616730265	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	cff3779ef11f0342
+700	4673	7873661628305230	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	31f7ff36920d26c0
+1104	4677	7873661629636670	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	2911ca566a0ee019
+1593	4840	7873661635419433	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	e2a89dbd4b51eb27
+4059	4936	7873661636409960	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	28a5f69ae5e56ac7
+2163	5653	7873661643458641	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	778492e1b75811f1
+2766	5835	7873661645356657	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	ef1fdcebf18ef919
+4937	5940	7873661646133162	C:/xampp/htdocs/Uni/LivingBooksAR/LivingBooks/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/3r6j2z34/obj/arm64-v8a/libswappywrapper.so	d12c39f4010ea04f
+3414	6312	7873661650129949	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	2fc0602c71fabbc
+6313	7057	7873661657571268	C:/xampp/htdocs/Uni/LivingBooksAR/LivingBooks/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/3r6j2z34/obj/arm64-v8a/libgame.so	c8d79f20bdc626f8
